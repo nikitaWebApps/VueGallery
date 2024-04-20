@@ -11,7 +11,7 @@ function toggleClick(option) {
 
 <template>
 	<footer class="footer-grid">
-		<div class="footer-grid__item">Выбор фона:</div>
+		<div class="footer-grid__item">Select Background:</div>
 		<div class="footer-grid__item" @click="toggleClick('image')">Image</div>
 		<div class="footer-grid__item" @click="toggleClick('black')">Black</div>
 		<div class="footer-grid__item" @click="toggleClick('white')">White</div>
