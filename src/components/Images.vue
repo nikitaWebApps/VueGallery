@@ -3,8 +3,6 @@ import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
 gsap.registerPlugin(Flip)
 
-import { ref, watch, nextTick, onMounted, computed, isRuntimeOnly } from 'vue'
-
 import imgForest from '../assets/images/forest.jpg'
 import imgBicycle from '../assets/images/bicycle.jpg'
 import imgCoffee from '../assets/images/coffee.jpg'
@@ -12,23 +10,26 @@ import imgChair from '../assets/images/chair.jpg'
 import imgPaints from '../assets/images/paints.jpg'
 import imgTypewriter from '../assets/images/typewriter.jpg'
 
+
+import { ref, nextTick, onMounted, computed, watchEffect } from 'vue'
+import { useSelectedBgStore, useHeaderOptions } from '@/stores/store';
+
+const bgType = ref('')
+const isIndexVisible = ref(false)
+
+watchEffect(() => {
+	bgType.value = useSelectedBgStore().bgClass
+	isIndexVisible.value = useHeaderOptions().isIndexSelected
+})
+
 const emit = defineEmits(['ImageData'])
 
-const runningIndex = ref(0)
 const indexImages = ref([]) //all Fetched Images Here
 const imageData = ref({}) //Current front image data to show in Info tab
-const props = defineProps(['bgState', 'indexState'])
-const backgroundType = ref(props.bgState.background)
 const isBackgroundImage = ref(true)
-const isIndexVisible = ref(false)
 
 const gsapState = ref(null)
 
-watch(props, () => {
-	backgroundType.value = props.bgState.background
-	isIndexVisible.value = props.indexState
-	animateIndexGrid()
-})
 
 onMounted(() => {
 	indexImages.value.push(
@@ -87,23 +88,9 @@ onMounted(() => {
 			credits: 'Photographer: Nikita Developer',
 		}
 	)
-	runningIndex.value = 4
 	//Initial image data setup
 	imageData.value = indexImages.value[2]
 	emit('ImageData', imageData.value)
-})
-
-const setBackgroundType = computed(() => {
-	if (backgroundType.value == 'black') {
-		isBackgroundImage.value = false
-		return 'slides-wrapper__background_black'
-	} else if (backgroundType.value == 'white') {
-		isBackgroundImage.value = false
-		return 'slides-wrapper__background_white'
-	} else {
-		isBackgroundImage.value = true
-		return 'slides-wrapper__background_image'
-	}
 })
 
 const animateGallery = () => {
@@ -138,13 +125,13 @@ function animateIndexGrid() {
 const classes = ['generic', 'slide', 'slide_front', 'slide_next', 'slide_before-next']
 /* 5 Images to distribute on slides */
 const galleryImages = computed(() => {
-	let imagesArr = indexImages.value.slice(0, 5)
-	return imagesArr
+	return indexImages.value.slice(0, 5)
 })
 
 const handleClickNext = () => {
 	let lastItem = indexImages.value.shift()
 	indexImages.value.push(lastItem)
+	imageData.value = indexImages.value[2]
 	emit('ImageData', imageData.value)
 	animateGallery()
 }
@@ -152,9 +139,9 @@ const handleClickNext = () => {
 function handleClickPrev() {
 	let lastItem = indexImages.value.pop()
 	indexImages.value.unshift(lastItem)
+	imageData.value = indexImages.value[2]
 	emit('ImageData', imageData.value)
 	animateGallery()
-	runningIndex.value -= 1
 }
 </script>
 
@@ -176,13 +163,6 @@ function handleClickPrev() {
 		</div>
 		<img
 			v-for="(image, index) in galleryImages"
-			:ref="
-				el => {
-					if (index === 3) {
-						imageData = image //send current front image data for Image Info tab
-					}
-				}
-			"
 			:src="image.src"
 			:key="image.id"
 			v-bind:data-name="image.alt"
@@ -192,7 +172,7 @@ function handleClickPrev() {
 			<div @click="handleClickNext" class="button button_right"></div>
 			<div @click="handleClickPrev" class="button button_left"></div>
 		</div>
-		<div class="slides-wrapper__background" :class="setBackgroundType"></div>
+		<div class="slides-wrapper__background" :class="bgType"></div>
 	</div>
 </template>
 
@@ -338,4 +318,3 @@ img {
 	display: block;
 }
 </style>
-

@@ -1,13 +1,16 @@
 <script setup>
-import { ref } from 'vue'
+import { useHeaderOptions } from '@/stores/store';
+const headerOption = useHeaderOptions()
 </script>
 
 <template>
 	<header class="header-grid">
 		<div class="header-grid__item">Site Name</div>
 		<div class="header-grid__item">About</div>
-		<div @click="$emit('imageInfo')" class="header-grid__item">Image Info</div>
-		<div @click="$emit('indexGrid')" class="header-grid__item">Index</div>
+		<div @click="headerOption.isImageInfoSelected = !headerOption.isImageInfoSelected"
+			class="header-grid__item">Image Info</div>
+		<div @click="headerOption.isIndexSelected = !headerOption.isIndexSelected" class="header-grid__item">
+			Index</div>
 	</header>
 </template>
 
@@ -27,4 +30,3 @@ import { ref } from 'vue'
 	}
 }
 </style>
-

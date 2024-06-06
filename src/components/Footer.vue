@@ -1,12 +1,11 @@
 <script setup>
-import { ref } from 'vue'
-
-const emit = defineEmits(['selectedBg'])
+import { useSelectedBgStore } from '@/stores/store';
+const bgStore = useSelectedBgStore()
 
 function toggleClick(option) {
-	const selectedData = { background: option }
-	emit('selectedBg', selectedData)
+	bgStore.setSelectedBg(option)
 }
+
 </script>
 
 <template>
@@ -39,4 +38,3 @@ function toggleClick(option) {
 	text-decoration: underline;
 }
 </style>
-
